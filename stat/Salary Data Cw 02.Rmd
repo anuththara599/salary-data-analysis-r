@@ -1,0 +1,150 @@
+---
+title: "Salary Data Cw 02"
+author: "42, 44, 51"
+date: "2025-12-16"
+output: html_document
+---
+
+```{r}
+data = read.csv("Salary_Data.csv")
+```
+
+## Understand the Data
+First, examine the dataset to understand its structure and variables.
+
+
+Age - (numeric)
+
+Gender - (categorical)
+
+Education Level - (categorical)
+
+Job Title - (categorical)
+
+Years of Experience - (numeric)
+
+Salary - (numeric – target variable)
+
+
+## Objectives
+
+Objectives are what you plan to do to answer the research questions.
+
+**Objective 1**
+
+To Examine age - salary correlation and patterns
+
+
+**Objective 2**
+
+To examine whether salary differs significantly across different education levels.
+
+
+## Hypotheses
+
+Hypotheses are required when you do inferential statistics (correlation, t-test, ANOVA, regression).
+
+**Hypothesis for Objective 1**
+
+Null Hypothesis (H₀):
+
+There is no significant correlation between age and salary
+
+Alternative Hypothesis (H₁):
+
+There is a significant positive correlation between age and salary
+
+
+**Hypothesis for Objective 2 (ANOVA)**
+
+
+Null Hypothesis (H₀):
+
+There is no significant difference in mean salary among different education levels.
+
+Alternative Hypothesis (H₁):
+
+There is a significant difference in mean salary among different education levels.
+
+
+## Methodology & Data Analysis Plan
+
+
+**Objective 1 – Analysis Plan**
+
+Statistical Technique:
+
+Pearson correlation
+
+
+**Objective 2 – Analysis Plan**
+
+Statistical Techniques:
+
+One-way ANOVA
+
+
+
+## Objective 1 – To Examine age - salary correlation and patterns
+
+
+```{r}
+age_salary_corr <- cor(data$Age, data$Salary, 
+                       use = "complete.obs")
+age_salary_corr
+
+cor_test <- cor.test(data$Age, data$Salary)
+cor_test
+```
+The Pearson correlation analysis revealed a strong positive relationship between age and salary, with a correlation coefficient of r = 0.728, p<0.001. This indicates that, within this sample, salary tends to increase with age. The null hypothesis of no correlation is rejected, supporting the alternative hypothesis that a significant positive correlation exists. This finding suggests that age is a meaningful predictor of salary in the dataset, though causation cannot be inferred from correlation alone.
+
+
+
+##  Objective 2 – Education Level and Salary
+
+```{r}
+data$Education.Level[data$Education.Level %in% 
+  c("Bachelor's", "Bachelor's Degree")] <- "Bachelor"
+
+data$Education.Level[data$Education.Level %in% 
+  c("Master's", "Master's Degree")] <- "Master"
+
+data$Education.Level[data$Education.Level %in% 
+  c("phD", "PhD")] <- "PhD"
+
+data$Education.Level <- factor(data$Education.Level)
+
+```
+
+
+
+```{r}
+data$Education.Level[data$Education.Level == ""] <- NA
+
+data$Education.Level <- factor(data$Education.Level)
+
+levels(data$Education.Level)
+
+```
+
+```{r}
+anova_model <- aov(Salary ~ Education.Level, data = data)
+summary(anova_model)
+```
+
+```{r}
+TukeyHSD(anova_model)
+```
+A one-way ANOVA yielded a highly significant result, F(3, 6694) = 1631, p < 0.001, leading to the rejection of the null hypothesis.
+
+
+## Conclusion
+
+This study aimed to explore the relationship between demographic and professional factors and salary. Two primary objectives were addressed:
+
+Objective 1 examined the correlation between age and salary. The analysis confirmed a statistically significant positive correlation ( r = 0.728 , p < 0.001), indicating that salary tends to increase with age in this dataset.
+
+Objective 2 investigated whether salary differs significantly across education levels. A one-way ANOVA yielded a highly significant result (F(3, 6694) = 1631, p < 0.001), leading to the rejection of the null hypothesis. Post-hoc Tukey HSD tests further clarified which education levels differ significantly in mean salary.
+
+Together, these findings suggest that both age and education level are associated with salary variations in the studied population. These insights could inform HR policies, compensation strategies, and further research into wage determinants. Future studies could incorporate multivariate regression to control for confounding variables such as job title, experience, and gender.
+
